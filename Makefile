@@ -44,6 +44,7 @@ ASL/ThreadTemplate/Src/ThreadControl.cpp \
 ASL/Utilities/Src/SubscribeBase.cpp \
 ASL/Utilities/Src/SubscribeDebounce.cpp \
 ASL/Utilities/Src/GPIODebounceTools.cpp \
+ASL/Utilities/Src/QuadratureDecoder.cpp \
 BBD/ILI9340/ILI9340.cpp \
 APL/Src/WatchdogTask.cpp \
 APL/Src/test.cpp \
