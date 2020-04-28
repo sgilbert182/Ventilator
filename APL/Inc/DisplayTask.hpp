@@ -64,6 +64,7 @@ public:
     void funcMain(void) override;
     void setRespRateValue(uint32_t value) override;
     void setPhaseValue(bool phase) override;
+    void setPressureValue(uint32_t value) override;
 
 private:
     void showSplashScreen(void);
@@ -79,6 +80,10 @@ private:
     bool m_newRespValue;
     uint32_t m_phaseValue;
     bool m_newPhaseValue;
+    uint32_t m_pressureValue;
+    bool m_newPressureValue;
+    uint32_t m_lineID;
+    uint32_t m_pointCnt;
     bool m_init;
 };
 

@@ -88,6 +88,8 @@ CDisplayTask::CDisplayTask(char const * const pName
                       , m_width
                       , (m_height / 2) + 1 + 10
                       , RED)
+    , m_lineID(0)
+    , m_pointCnt(0)
 {}
 
 /**\brief   Starts display
@@ -158,22 +160,22 @@ void CDisplayTask::funcMain(void)
             0x5872,0x5ad8,0x5d41,0x5fae,0x621e,0x6491,0x6707,0x697f,
             0x6bfa,0x6e76,0x70f4,0x7374,0x75f5,0x7876,0x7af9,0x7d7c};
 
-    static uint32_t i = 0;
-    static uint32_t lineID = 0;
-
-    GraphWidget.addPoint(lineID, (((float)testData[i]) /65535.0f) * (100.0 / (lineID + 1)), RED);
-    if(i > ARRAY_LEN(testData))
-    {
-        i = 0;
-        GraphWidget.setLineColour(lineID, DARKGREY);
-        lineID = (++lineID) % MAX_LINES;
-
-        GraphWidget.deleteLine(lineID);
-    }
-    else
-    {
-        ++i;
-    }
+//    static uint32_t i = 0;
+//    static uint32_t lineID = 0;
+//
+//    GraphWidget.addPoint(lineID, (((float)testData[i]) /65535.0f) * (100.0 / (lineID + 1)), RED);
+//    if(i > ARRAY_LEN(testData))
+//    {
+//        i = 0;
+//        GraphWidget.setLineColour(lineID, DARKGREY);
+//        lineID = (++lineID) % MAX_LINES;
+//
+//        GraphWidget.deleteLine(lineID);
+//    }
+//    else
+//    {
+//        ++i;
+//    }
 
     if(m_newRespValue)
     {
@@ -185,10 +187,25 @@ void CDisplayTask::funcMain(void)
 
     if(m_newPhaseValue)
     {
-        IndicatorWidget.setColour(m_phaseValue ? GREEN : BLUE);
+        IndicatorWidget.setColour(m_phaseValue ? DARKGREEN : RED);
         m_newPhaseValue = false;
     }
 
+    if(m_newPressureValue)
+    {
+        GraphWidget.addPoint(m_lineID, m_pressureValue, m_phaseValue ? DARKGREEN : RED);
+        ++m_pointCnt;
+        if(LINE_LENGTH < m_pointCnt)
+        {
+            m_pointCnt = 0;
+            GraphWidget.setLineColour(m_lineID, DARKGREY);
+            m_lineID = (++m_lineID) % MAX_LINES;
+
+            GraphWidget.deleteLine(m_lineID);
+        }
+
+        m_newPressureValue = false;
+    }
 }
 
 /**\brief   Shows the start spash screen
@@ -235,4 +252,11 @@ void CDisplayTask::setPhaseValue(bool phase)
     }
 }
 
-
+void CDisplayTask::setPressureValue(uint32_t value)
+{
+    if(this->m_init)
+    {
+        m_pressureValue = value;
+        m_newPressureValue = true;
+    }
+}
