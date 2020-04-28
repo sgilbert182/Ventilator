@@ -269,7 +269,6 @@ void CPneumaticActuator::smallIncrementAmplitude(void)
     ++m_amplitude;
 }
 
-
 /**\brief   Decrement the speed at which the sinewave is indexed through.
  *
  * \param   None
