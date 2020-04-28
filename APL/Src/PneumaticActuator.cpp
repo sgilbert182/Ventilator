@@ -30,7 +30,7 @@ DEFINITIONS
 #endif
 
 #define MAX_POS_VAL     (65536.0f)                  // 2^16 16 bit pwm
-#define PWM_LSB         (0.02 / MAX_POS)            // 20mA / max pwm value
+#define PWM_LSB         (0.02 / MAX_POS_VAL)        // 20mA / max pwm value
 #define MIN_POS_VAL     (0.004 / PWM_LSB)           // 4mA / pwm bit wieght
 #define DELTA_POS_VAL   (MAX_POS_VAL - MIN_POS_VAL) // 20mA - 4mA bit value
 
@@ -188,7 +188,7 @@ void CPneumaticActuator::funcMain(void)
     if(m_pActuatorDisplay)
     {
         m_pActuatorDisplay->setPhaseValue(m_breathPhase);
-//        m_pActuatorDisplay->setPressureValue(demandedPressure);
+        m_pActuatorDisplay->setPressureValue((((sinewave[(m_breathPhase) ? m_sineIndex : 0]) / 65535.0f) * 100)  * (m_amplitude / 100.0f));
     }
 }
 
