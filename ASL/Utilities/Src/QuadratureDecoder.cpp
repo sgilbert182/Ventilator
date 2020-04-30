@@ -69,17 +69,39 @@ CQuadratureDecoder::CQuadratureDecoder(CDebounceTask * pDebounceTask
     {
         if(m_APort)
         {
-            m_pDebounceTask->subscribe(m_APort, m_APin, GPIO_PULLUP
-                                       , this->_callbackA, this
-                                       , nullptr, nullptr);
+            m_pDebounceTask->subscribe(m_APort, m_APin, GPIO_NOPULL
+                                       , nullptr, nullptr
+                                       , this->_callback, this);
         }
         if(m_BPort)
         {
-            m_pDebounceTask->subscribe(m_BPort, m_BPin, GPIO_PULLUP
-                                       , this->_callbackB, this
+            m_pDebounceTask->subscribe(m_BPort, m_BPin, GPIO_NOPULL
+                                       , nullptr, nullptr
                                        , nullptr, nullptr);
         }
     }
+}
+
+/**\brief   returns the counter value.
+ *
+ * \param   None
+ *
+ * \return  counter value
+ */
+int32_t CQuadratureDecoder::getPosition(void)
+{
+    return m_count;
+}
+
+/**\brief   Resets the counter.
+ *
+ * \param   None
+ *
+ * \return  None
+ */
+void CQuadratureDecoder::resetPosition(void)
+{
+    m_count = 0;
 }
 
 /**\brief   Reads the IO states of the incoming quadrature inputs.
@@ -90,24 +112,10 @@ CQuadratureDecoder::CQuadratureDecoder(CDebounceTask * pDebounceTask
  */
 void CQuadratureDecoder::calc(uint32_t channel)
 {
-    /* if channel A was triggered then we need to see channel B's state and
-     * vice versa.
+    /* if channel A is high and channel B is low, channel A is leading so
+     * assume clockwise rotation.
      */
-    if(channel)
-    {
-        /* if channel A is high and channel B is low, channel A is leading so
-         * assume clockwise rotation.
-         */
-        m_count += (GPIO_PIN_SET == HAL_GPIO_ReadPin(m_BPort, m_BPin)) ? 1 : -1;
-
-    }
-    else
-    {
-        /* if channel B is high and channel B is low, channel B is leading so
-         * assume ant-clockwise rotation.
-         */
-        m_count += (GPIO_PIN_SET == HAL_GPIO_ReadPin(m_APort, m_APin)) ? -1 : 1;
-    }
+    m_count += m_pDebounceTask->getGPIOState(m_BPort, m_BPin) ? -1 : 1;
 }
 
 /**\brief   Callback triggered when IO A is asserted.
@@ -116,18 +124,7 @@ void CQuadratureDecoder::calc(uint32_t channel)
  *
  * \return  None
  */
-void CQuadratureDecoder::_callbackA(void * pArgs)
+void CQuadratureDecoder::_callback(void * pArgs)
 {
     ((CQuadratureDecoder *)pArgs)->calc(1);
-}
-
-/**\brief   Callback triggered when IO B is asserted.
- *
- * \param   pArgs   - class to call
- *
- * \return  None
- */
-void CQuadratureDecoder::_callbackB(void * pArgs)
-{
-    ((CQuadratureDecoder *)pArgs)->calc(0);
 }

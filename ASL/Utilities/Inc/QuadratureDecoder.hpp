@@ -18,6 +18,7 @@
 INCLUDES
 *******************************************************************************/
 
+#include "PositionDecoder.hpp"
 #include "DebounceTask.hpp"
 
 /*******************************************************************************
@@ -37,16 +38,18 @@ NAMESPACE
 *******************************************************************************/
 
 class CQuadratureDecoder
+    : public CPositionDecoder
 {
 public:
-    CQuadratureDecoder(CDebounceTask * pDebounceTask
-                       , GPIO_TypeDef * A_port, uint16_t A_pin
-                       , GPIO_TypeDef * B_port, uint16_t B_pin);
+    CQuadratureDecoder(CDebounceTask * pDebounceTask = nullptr
+                       , GPIO_TypeDef * A_port = nullptr, uint16_t A_pin = 0
+                       , GPIO_TypeDef * B_port = nullptr, uint16_t B_pin = 0);
     ~CQuadratureDecoder() = default;
+    virtual int32_t getPosition(void) override;
+    virtual void resetPosition(void) override;
 
 private:
-    static void _callbackA(void * pArgs);
-    static void _callbackB(void * pArgs);
+    static void _callback(void * pArgs);
     void calc(uint32_t channel);
 
 private:
